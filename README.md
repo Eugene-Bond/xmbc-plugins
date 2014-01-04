@@ -1,0 +1,4 @@
+xmbc-plugins
+============
+
+XBMC addons
