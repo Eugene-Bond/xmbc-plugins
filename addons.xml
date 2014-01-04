@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addons>
+<addon id="plugin.video.kartina.tv"
+       name="Kartina.TV"
+       version="1.3.0"
+       provider-name="Eugene Bond">
+  <requires>
+    <import addon="xbmc.python" version="1.0"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource"
+             provides="video"
+             library="default.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary>Онлайн-телевидение Kartina.TV</summary>
+    <description>Онлайн-телевидение Kartina.TV: более 110 русскоязычных каналов и видеотека от 15 евро в месяц</description>
+    <platform>all</platform>
+  </extension>
+</addon>
+
+<addon id="plugin.video.rodnoe.tv"
+       name="Rodnoe.TV"
+       version="1.3.0"
+       provider-name="Eugene Bond">
+  <requires>
+    <import addon="xbmc.python" version="1.0"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource"
+             provides="video"
+             library="default.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary>Онлайн-телевидение Rodnoe.TV</summary>
+    <description>Онлайн-телевидение Rodnoe.TV: более 160 русскоязычных каналов от 10 евро в месяц.</description>
+    <platform>all</platform>
+  </extension>
+</addon>
+
+<addon id="plugin.video.tv-over.net"
+       name="TV-Over.NET"
+       version="1.1.0"
+       provider-name="Eugene Bond">
+  <requires>
+    <import addon="xbmc.python" version="1.0"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource"
+             provides="video"
+             library="default.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary>Онлайн-телевидение TV-Over.NET</summary>
+    <description>Онлайн-телевидение TV-Over.NET: более 160 русскоязычных, балтийских и прочих каналов от 10 евро в месяц.</description>
+    <platform>all</platform>
+  </extension>
+</addon>
+
+<addon id="repository.bond" name="Eugene Bond XBMC Add-ons" version="1.0.0" provider-name="Eugene Bond">
+	<extension point="xbmc.addon.repository" name="Eugene Bond XBMC Add-ons">
+		<info compressed="false">https://github.com/Eugene-Bond/xmbc-plugins/addons.xml</info>
+		<checksum>https://github.com/Eugene-Bond/xmbc-plugins/addons.xml.md5</checksum>
+		<datadir zip="false">https://github.com/Eugene-Bond/xmbc-plugins/</datadir>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary>Install Add-ons from Bond's Add-on Repository</summary>
+		<description>Plug-ins for XBMC</description>
+		<disclaimer>There are add-ons that allow viewing popular Russian IPTV providers in the program XBMC</disclaimer>
+		<platform>all</platform>
+	</extension>
+</addon>
+</addons>

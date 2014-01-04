@@ -1,0 +1,42 @@
+8
+
+dir
+314
+https://seppius-xbmc-repo.googlecode.com/svn/trunk/addons/plugin.video.kartina.tv/resources/icons
+https://seppius-xbmc-repo.googlecode.com/svn
+
+
+
+2011-01-16T13:19:07.874294Z
+88
+eugene.bond@gmail.com
+
+
+svn:special svn:externals svn:needs-lock
+
+play.png
+file
+
+
+
+
+2010-12-02T07:05:16.000000Z
+f94a340c9f97c38c8ce315b14acb2b76
+2011-01-16T13:19:07.874294Z
+88
+eugene.bond@gmail.com
+has-props
+
+play-stop.png
+file
+
+
+
+
+2010-12-02T07:05:16.000000Z
+5d079f814d651280df175dc8c74186a2
+2011-01-16T13:19:07.874294Z
+88
+eugene.bond@gmail.com
+has-props
+
