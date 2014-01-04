@@ -13,7 +13,7 @@ do
         addon_name=`basename $f`
         
         rm -f "$addon_name/$addon_name-$version.zip"
-        zip -r "$addon_name-$version.zip" "$addon_name"
+        zip -r "$addon_name/$addon_name-$version.zip" "$addon_name" -x "*.zip"
 done
 
 python addons_xml_generator.py
