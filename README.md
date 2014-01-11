@@ -14,7 +14,7 @@ XBMC дополнения для просмотра популярных про�
 
 Инструкции по установке
 -------------
-- скачайте [repository.bond.zip](https://github.com/Eugene-Bond/xmbc-plugins/blob/master/repository.bond.zip) файл
+- скачайте [repository.bond.zip](https://github.com/Eugene-Bond/xmbc-plugins/raw/master/repository.bond.zip) файл
 - в XBMC addons manager, выберите "install from zip file", найдите скачаный zip файл и выберите его
 - репозиторий будет установлен
 - новые дополнения станут доступны для установки
@@ -51,7 +51,7 @@ At the moment this repository contains the following IPTV providers:
 
 Installation instructions
 -------------
-- download [repository.bond.zip](https://github.com/Eugene-Bond/xmbc-plugins/blob/master/repository.bond.zip) file
+- download [repository.bond.zip](https://github.com/Eugene-Bond/xmbc-plugins/raw/master/repository.bond.zip) file
 - in XBMC addons manager, select "install from zip file", navigate to the downloaded zip file and select it
 - repository will be installed
 - new addons will be available for installation
