@@ -40,6 +40,10 @@ except ImportError:
 		def translatePath(self, param):
 			return './'
 		
+		def getVersion(self):
+			xbmc_version = xbmc.getInfoLabel( "System.BuildVersion" )
+			return xbmc_version[:2]
+		
 	
 	class xbmcaddon_foo:
 		def __init__(self, id):

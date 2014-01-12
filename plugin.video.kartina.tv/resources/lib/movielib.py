@@ -28,6 +28,7 @@ except ImportError:
 		def getCacheThumbName(self, path):
 			return ''
 	
+		
 	xbmc = xbmc_boo()
 	
 
@@ -59,12 +60,20 @@ import string, os, re, urllib
 
 try:
 	from sqlite3 import dbapi2 as sqlite
-	xbmc.output("Loading sqlite3 as DB engine")
+	xbmc.log("Loading sqlite3 as DB engine")
 except:
 	from pysqlite2 import dbapi2 as sqlite
-	xbmc.output("Loading pysqlite2 as DB engine")
+	xbmc.log("Loading pysqlite2 as DB engine")
 
-
+def getXbmcVersion():
+	xbmc_version = xbmc.getInfoLabel( "System.BuildVersion" )
+	try: 
+		return int(xbmc_version[:2])
+	except ValueError:
+		#should never happen
+		return 1
+		
+		
 def strip_html(text):
 	def fixup(m):
 		text = m.group(0)
@@ -110,7 +119,7 @@ class movielibmovie:
 		self.trailer = ''
 		self.rating = 0
 		self.country = None
-		xbmc.output('[movielib] creating a movie object')
+		xbmc.log('[movielib] creating a movie object')
 		
 	def setTitle(self, title):
 		self.title = title
@@ -155,7 +164,11 @@ class movielib:
 	
 	def __init__(self, db = None):
 		if not db:
-			db = 'special://profile/Database/MyVideos34.db'
+			if(getXbmcVersion() > 11):
+				# xbmc12 seems to be using MyVideos75.db for the database name
+				db = 'special://profile/Database/MyVideos75.db'
+			else:
+				db = 'special://profile/Database/MyVideos34.db'
 		db = xbmc.translatePath(db)
 		self.connection = sqlite.connect(db)
 		self.connection.row_factory = sqlite.Row
@@ -163,7 +176,7 @@ class movielib:
 	
 	def addMovie(self, movie):
 		if len(movie.files):
-			xbmc.output('[movielib] adding a "%s" movie' % movie.title.encode('utf-8'))
+			xbmc.log('[movielib] adding a "%s" movie' % movie.title.encode('utf-8'))
 			counter = 0
 			for filename, filetitle in movie.files:
 				mid = self._vdbAddMovie(movie.path, filename)
@@ -197,11 +210,12 @@ class movielib:
 			self.connection.commit()
 			return mid
 		else:
-			xbmc.output('[movielib] movie is here, but files are not here.. skipping %s' % movie.title.encode('utf-8'))
+			xbmc.log('[movielib] movie is here, but files are not here.. skipping %s' % movie.title.encode('utf-8'))
 	
 	def _vdbDeleteMovie(self, mid):
-		xbmc.output('[movielib] removing movie #%s' % mid)
-		self.db.execute("DELETE FROM setlinkmovie WHERE idMovie=?", (mid,))
+		xbmc.log('[movielib] removing movie #%s' % mid)
+		if(getXbmcVersion() < 12):
+			self.db.execute("DELETE FROM setlinkmovie WHERE idMovie=?", (mid,))
 		self.db.execute("DELETE FROM genrelinkmovie WHERE idMovie=?", (mid,))
 		self.db.execute("DELETE FROM actorlinkmovie WHERE idMovie=?", (mid,))
 		self.db.execute("DELETE FROM studiolinkmovie WHERE idMovie=?", (mid,))
@@ -269,9 +283,13 @@ class movielib:
 		if path:
 			cache = xbmc.getCacheThumbName(path)
 			if cache:
-				THUMB_CACHE_PATH   = os.path.join( xbmc.translatePath( "special://profile/" ), "Thumbnails", "Video" )
+				if(getXbmcVersion() > 11):
+					THUMB_CACHE_PATH   = os.path.join( xbmc.translatePath( "special://profile/" ), "Thumbnails")
+				else:
+					THUMB_CACHE_PATH   = os.path.join( xbmc.translatePath( "special://profile/" ), "Thumbnails", "Video" )
+					
 				cache = os.path.join(THUMB_CACHE_PATH, cache[0], cache)
-				xbmc.output('[movielib] downloading image %s to cache %s' % (img, cache))
+				xbmc.log('[movielib] downloading image %s to cache %s' % (img, cache))
 				urllib.urlretrieve(img, cache)
 	
 	def _vdbUpdateMovieTrailer(self, mid, url):
@@ -318,7 +336,8 @@ class movielib:
 		return self._vdbAddToTable("sets", "idSet", "strSet", name)
 	
 	def _vdbAddSetToMovie(self, setid, movieid):
-		self._vdbAddToLinkTable("setlinkmovie", "idSet", setid, "idMovie", movieid)
+		if(getXbmcVersion() < 12):
+			self._vdbAddToLinkTable("setlinkmovie", "idSet", setid, "idMovie", movieid)
 	
 	def _vdbAddGenreToMovie(self, movieid, genre):
 		gid = self._vdbAddGenre(genre)
@@ -359,14 +378,16 @@ class movielib:
 			return
 		fid = self._vdbGetFileId(pid, filename)
 		if not fid:
-			xbmc.output('[movielib] adding a new file %s' % filename.encode('utf-8'))
+			xbmc.log('[movielib] adding a new file %s' % filename.encode('utf-8'))
+			# [Ilya] other plugins seem to write the full plugin path in the filename, and it makes the video lib work in xbmc 12+
+			filename = "plugin://plugin.video.kartina.tv/"+filename
 			if self.db.execute("INSERT INTO files (idFile,idPath,strFileName) VALUES (NULL,?,?)", (pid, filename,)):
 				fid = self.db.lastrowid
 		
 		return fid
 	
 	def vdbCleanUp(self, path, removeFiles = True):
-		xbmc.output('[movielib] starting cleanup of %s' % path)
+		xbmc.log('[movielib] starting cleanup of %s' % path)
 		path = self._addSlashAtEnd(path)
 		pid = self._vdbGetPathId(path)
 		if pid:
@@ -392,7 +413,7 @@ class movielib:
 		# disabled for now as plugins on Windows uses non-system slashes?
 		if not path.endswith(os.path.sep):
 			#path += os.path.sep
-			xbmc.output('[movielib] path %s was not translated to %s' % (path, path + os.path.sep))
+			xbmc.log('[movielib] path %s was not translated to %s' % (path, path + os.path.sep))
 			
 		return path
 	

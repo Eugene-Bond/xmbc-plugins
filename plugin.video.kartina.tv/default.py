@@ -235,12 +235,18 @@ def ShowChannelsList(plugin, mode = 'TV'):
 			if str(channel['id']) in favs:
 				rating = 10
 			
+			archiveIcon = ''
+			if(channel['have_archive']):
+				# some way to indicate program has archive
+				archiveIcon = ''
+			
 			if __settings__.getSetting('colorize_groups') == 'false':
 				channel_title = channel['title']
 			else:
 				channel_title = '[COLOR %s]%s[/COLOR]' % (color, channel['title'])
-			
-			label = '%s[B] %s.%s[/B] %s %s' % (timerange, channel_title, played, channel['subtitle'], channel['info'])
+				
+
+			label = '%s[B]%s %s.%s[/B] %s %s' % (timerange, archiveIcon, channel_title, played, channel['subtitle'], channel['info'])
 			item.setLabel(label)			
  			item.setIconImage(channel['icon'])
 			item.setInfo( type='video', infoLabels={'title': channel['subtitle'], 'plotoutline': channel['info'], 'plot': channel['info'], 'genre': channel['genre'], 'duration': str(channel['duration']),  'overlay': overlay, 'ChannelNumber': str(counter), 'ChannelName': channel['title'], 'StartTime': datetime.datetime.fromtimestamp(channel['epg_start']).strftime('%H:%M'), 'EndTime': datetime.datetime.fromtimestamp(channel['epg_end']).strftime('%H:%M'), 'rating': rating})
@@ -249,7 +255,7 @@ def ShowChannelsList(plugin, mode = 'TV'):
 			
 			if 'aspect_ratio' in channel and channel['aspect_ratio']:
 				item.setProperty('AspectRatio', channel['aspect_ratio'])
-			
+
 			popup = []
 			
 			if channel['have_epg'] != False:
@@ -785,6 +791,10 @@ def MovieLib(plugin, do):
 		xbmc.log('[%s] progress step size set to %s as 60 / %s' % (PLUGIN_NAME, stepSize, len(toprocess)), level=xbmc.LOGDEBUG)
 		counter = 0
 		for vod in toprocess:
+			# [Ilya] i keep getting disconnected when indexing, so i added this line to run every 10 items processed
+			if(counter % 10 < 1):
+				xbmc.log('\nAuthenticating preventively\n')
+				plugin._auth(plugin.login,plugin.password)
 			info = plugin.getVideoInfo(vod['id'])
 			film = movielib.movielibmovie(sys.argv[0])
 			film.setTitle(vod['title'])
