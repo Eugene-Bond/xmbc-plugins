@@ -150,9 +150,9 @@ class kartina:
 		
 		__settings__ = xbmcaddon.Addon(self.addonid)
 		
-		isXBMC = 'XBMC'
+		isXBMC = 'KARTINA-XBMC'
 		if getattr(xbmc, "nonXBMC", None) is not None:
-			isXBMC = 'nonXBMC'
+			isXBMC = 'KARTINA-nonXBMC'
 		
 		#ua = '%s v%s (%s %s [%s]; %s; python %s) as %s' % (__settings__.getAddonInfo('id'), __settings__.getAddonInfo('version'), isXBMC, xbmc.getInfoLabel('System.BuildVersion'), xbmc.getInfoLabel('System.ScreenMode'), osname, pyver, self.login)
 		

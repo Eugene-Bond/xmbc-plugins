@@ -4,7 +4,7 @@ Python implementation of ga.php.
 Snatched from (based on, yep!) https://github.com/b1tr0t/Google-Analytics-for-Mobile--python-
 Thank you very much, man!
 
-Let me know if you will be in Prague, b1tr0t, I will set a beer, 
+Let me know if you will be in Berlin, b1tr0t, I will set a beer, 
 	Eugene 
 """
 import re
