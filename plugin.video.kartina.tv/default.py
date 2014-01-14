@@ -236,9 +236,11 @@ def ShowChannelsList(plugin, mode = 'TV'):
 				rating = 10
 			
 			archiveIcon = ''
-			if(channel['have_archive']):
-				# some way to indicate program has archive
-				archiveIcon = ''
+			
+			if __settings__.getSetting('mark_archive') == 'true':
+				if(channel['have_archive']):
+					# some way to indicate program has archive
+					archiveIcon = __language__(30046)
 			
 			if __settings__.getSetting('colorize_groups') == 'false':
 				channel_title = channel['title']
