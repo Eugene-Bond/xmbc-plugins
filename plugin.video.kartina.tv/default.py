@@ -19,13 +19,15 @@
 # */
 
 import xbmcaddon, string, xbmc, xbmcgui, xbmcplugin, os
-sys.path.append(os.path.join(os.getcwd(), 'resources', 'lib'))
+PLUGIN_ID = 'plugin.video.kartina.tv'
+addon = xbmcaddon.Addon(id=PLUGIN_ID)
+sys.path.append(os.path.join(addon.getAddonInfo('path'), 'resources', 'lib'))
 import iptv
 
 import datetime, time
 import urllib, threading, re
 
-PLUGIN_ID = 'plugin.video.kartina.tv'
+
 __settings__ = xbmcaddon.Addon(id=PLUGIN_ID)
 __language__ = __settings__.getLocalizedString
 USERNAME = __settings__.getSetting('username')
@@ -35,7 +37,12 @@ handle = int(sys.argv[1])
 PLUGIN_NAME = 'Kartina.TV'
 PLUGIN_CORE = None
 TRANSSID = ''
-thumb = os.path.join( os.getcwd(), "icon.png" )
+
+
+
+thumb = os.path.join( addon.getAddonInfo('path'), "icon.png" )
+
+
 
 def get_params():
 	param=[]
@@ -125,10 +132,10 @@ def Archive(plugin, id, params):
 		
 		if can_play:
 			item.setProperty('IsPlayable', 'true')
-			item.setIconImage(os.path.join(os.getcwd(), 'resources', 'icons', 'play.png'))
+			item.setIconImage(os.path.join(addon.getAddonInfo('path'), 'resources', 'icons', 'play.png'))
 			uri = sys.argv[0] + '?mode=WatchTV&channel=%s&title=%s&ts=%s' % (id, prog['title'], prog['time']) 
 		else:
-			item.setIconImage(os.path.join(os.getcwd(), 'resources', 'icons', 'play-stop.png'))
+			item.setIconImage(os.path.join(addon.getAddonInfo('path'), 'resources', 'icons', 'play-stop.png'))
 			item.setProperty('IsPlayable', 'false')
 		
 		xbmcplugin.addDirectoryItem(handle,uri,item,False)
@@ -726,7 +733,7 @@ def VideoLib(plugin, params):
 	
 	
 	if do == 'Play':
-	
+		
 		last_update = __settings__.getSetting('video_last_update') or '0000-00-00 00:00:00'
 		if last_update == '0000-00-00 00:00:00':
 			dialog = xbmcgui.Dialog()
