@@ -16,6 +16,7 @@ __version__ = '2.10'
 
 IPTV_DOMAIN = 'iptv.kartina.tv'
 IPTV_API = 'http://%s/api/json/%%s' % IPTV_DOMAIN
+IPTV_API_HTTPS = 'https://%s/api/json/%%s' % IPTV_DOMAIN
 
 try:
 	import xbmc, xbmcaddon
@@ -166,8 +167,12 @@ class kartina:
 		if self.AUTH_OK == False:
 			if inauth == None:
 				self._auth(self.login, self.password)
+				
+		if cmd=='login':
+			url = IPTV_API_HTTPS % cmd
+		else:
+			url = IPTV_API % cmd
 		
-		url = IPTV_API % cmd
 		if inauth:
 			postparams = params
 		else:
@@ -259,8 +264,11 @@ class kartina:
 					xbmc.log('[Kartina.TV] blead, tut realno palevo nezdorovoe!', xbmc.LOGWARNING)
 			self.AUTH_OK = False
 	
+	def getGenresList(self):
+		return self._request('vod_genres', '')
 	
 	def getChannelsList(self):
+		
 		if self.channels_ttl < time():
 			jsonChannels = self._request('channel_list', '')
 
@@ -408,7 +416,7 @@ class kartina:
 			
 		return res
 	
-	def getVideoList(self, mode, page, pagesize=15, search={}):
+	def getVideoList(self, mode, page, genre, pagesize=15, search={}):
 		if pagesize == 'all':
 			pagesize = 999
 			page = 1
@@ -418,7 +426,12 @@ class kartina:
 				pagesize = result['total'] 
 			xbmc.log('[Kartina.TV] pagesize set to %s to reflect "all" param' % pagesize)
 		
-		params = 'type=%s&nums=%s&page=%s' % (mode, pagesize, page)
+		genreParam= ''
+		if(genre):
+			genreParam='&genre=%s' % genre
+		
+		params = 'type=%s&nums=%s&page=%s%s' % (mode, pagesize, page,genreParam)
+		
 		result = self._request('vod_list', params)
 		res = []
 		for vod in result['rows']:
