@@ -45,6 +45,8 @@
 	<string id="30042">All TV channels</string>
 	<string id="30043">Guessing 16:9 aspect ratio</string>
 	<string id="30044">Old way of video library</string>
+	<string id="30045">Mark channels that have an archive with "*"</string>
+	<string id="30046">*</string>
 	<string id="31001">General settings</string>
 	<string id="31002">Channels list</string>
 	<string id="32000">VideoLibrary cleanup</string>

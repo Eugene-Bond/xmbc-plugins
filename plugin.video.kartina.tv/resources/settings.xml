@@ -8,6 +8,7 @@
 		<setting id="guess_aspect_ratio" type="bool" label="30043" default="true" />
 		<setting id="ask_adjust" type="bool" label="30010" default="false" />
 		<setting id="old_videolib" type="bool" label="30044" default="false" />
+		<setting id="mark_archive" type="bool" label="30045" default="false" />
 		<setting id="separator" type="lsep" label=""/>
 		<setting id="protected_code" type="text" label="30026" option="hidden" default="" />
 	</category>

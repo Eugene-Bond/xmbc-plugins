@@ -19,13 +19,14 @@
 # */
 
 import xbmcaddon, string, xbmc, xbmcgui, xbmcplugin, os
-sys.path.append(os.path.join(os.getcwd(), 'resources', 'lib'))
+PLUGIN_ID = 'plugin.video.kartina.tv'
+addon = xbmcaddon.Addon(id=PLUGIN_ID)
+sys.path.append(os.path.join(addon.getAddonInfo('path'), 'resources', 'lib'))
 import iptv
 
 import datetime, time
 import urllib, threading, re
 
-PLUGIN_ID = 'plugin.video.kartina.tv'
 __settings__ = xbmcaddon.Addon(id=PLUGIN_ID)
 __language__ = __settings__.getLocalizedString
 USERNAME = __settings__.getSetting('username')
@@ -35,7 +36,11 @@ handle = int(sys.argv[1])
 PLUGIN_NAME = 'Kartina.TV'
 PLUGIN_CORE = None
 TRANSSID = ''
-thumb = os.path.join( os.getcwd(), "icon.png" )
+
+
+
+thumb = os.path.join( addon.getAddonInfo('path'), "icon.png" )
+
 
 def get_params():
 	param=[]
@@ -62,7 +67,7 @@ INFOTIMER_HIDE = None
 
 VIDEOTEKA = 'VideoLib'
 if __settings__.getSetting('old_videolib') == 'true':
-	VIDEOTEKA = 'Video'
+	VIDEOTEKA = 'SelectGenre' # used to be VIDEOTEKA = 'Video'
 
 def Archive(plugin, id, params):
 	
@@ -125,10 +130,10 @@ def Archive(plugin, id, params):
 		
 		if can_play:
 			item.setProperty('IsPlayable', 'true')
-			item.setIconImage(os.path.join(os.getcwd(), 'resources', 'icons', 'play.png'))
+			item.setIconImage(os.path.join(addon.getAddonInfo('path'), 'resources', 'icons', 'play.png'))
 			uri = sys.argv[0] + '?mode=WatchTV&channel=%s&title=%s&ts=%s' % (id, prog['title'], prog['time']) 
 		else:
-			item.setIconImage(os.path.join(os.getcwd(), 'resources', 'icons', 'play-stop.png'))
+			item.setIconImage(os.path.join(addon.getAddonInfo('path'), 'resources', 'icons', 'play-stop.png'))
 			item.setProperty('IsPlayable', 'false')
 		
 		xbmcplugin.addDirectoryItem(handle,uri,item,False)
@@ -189,9 +194,9 @@ def ShowChannelsList(plugin, mode = 'TV'):
 				overlay = 3
 			else:
 				if channel['have_archive']:
-					overlay = 1
+					overlay = 1	#does not work
 				else:
-					overlay = 0
+					overlay = 0 
 					
 			if str(channel['id']) in favs:
 				overlay = 7
@@ -236,9 +241,11 @@ def ShowChannelsList(plugin, mode = 'TV'):
 				rating = 10
 			
 			archiveIcon = ''
-			if(channel['have_archive']):
-				# some way to indicate program has archive
-				archiveIcon = ''
+			
+			if __settings__.getSetting('mark_archive') == 'true':
+				if(channel['have_archive']):
+					# some way to indicate program has archive
+					archiveIcon = __language__(30046)
 			
 			if __settings__.getSetting('colorize_groups') == 'false':
 				channel_title = channel['title']
@@ -299,8 +306,20 @@ def ShowChannelsList(plugin, mode = 'TV'):
 		xbmc.executebuiltin("XBMC.AlarmClock(%s,XBMC.Container.Refresh,%s,True)" % (refreshAlarmId, refresh_rate))
 	#xbmc.executebuiltin( "Container.SetViewMode(51)")
 
+def SelectGenres(plugin, params):
+	xbmc.log('Select genres screen initiated')
+	glist = plugin.getGenresList();
+	
+	for genre in glist['genres']:
+		title = genre['name']
+		item=xbmcgui.ListItem(title)
+		uri = sys.argv[0] + '?mode=Video&genre=%s' % (genre['id'])
+		xbmcplugin.addDirectoryItem(handle,uri,item,True)
+	
+	xbmcplugin.endOfDirectory(handle,True,False)
 
 def Video(plugin, params):
+	
 	if 'mode' in params:
 		mode = params['mode']
 	else:
@@ -313,6 +332,11 @@ def Video(plugin, params):
 	else:
 		page = 1
 	
+	genreParam=''
+	genre=''
+	if 'genre' in params:
+		genre = params['genre']
+		genreParam = '&genre=%s' % genre
 	
 	
 	if page > 1:
@@ -321,12 +345,12 @@ def Video(plugin, params):
 		goback.setLabel(goback_title)
 		goback.setProperty('IsPlayable', 'false')
 		goback.setInfo( type='video', infoLabels={'title': goback_title})
-		uri = sys.argv[0] + '?mode=Video&mode=%s&page=%d' % (mode, page-1)
+		uri = sys.argv[0] + '?mode=Video&mode=%s&page=%d%s' % (mode, page-1,genreParam)
 		xbmc.log(uri) 
 		xbmcplugin.addDirectoryItem(handle,uri,goback,True)
 	
 	
-	vlist = plugin.getVideoList(mode, page, 50)
+	vlist = plugin.getVideoList(mode, page, genre, 50)
 	
 	for film in vlist:
 		title = film['title']
@@ -345,10 +369,12 @@ def Video(plugin, params):
 	goahead.setLabel(goahead_title)
 	goahead.setProperty('IsPlayable', 'false')
 	goahead.setInfo( type='video', infoLabels={'title': goahead_title})
-	uri = sys.argv[0] + '?mode=Video&mode=%s&page=%d' % (mode, page+1)
-	xbmc.log(uri) 
-	xbmcplugin.addDirectoryItem(handle,uri,goahead,True)
+	uri = sys.argv[0] + '?mode=Video&mode=%s&page=%d%s' % (mode, page+1,genreParam)
 	
+	if(vlist):
+		if len(vlist)>49:
+			xbmcplugin.addDirectoryItem(handle,uri,goahead,True)
+		
 	xbmcplugin.endOfDirectory(handle,True,False)
 
 def VideoInfo(plugin, params):
@@ -586,6 +612,7 @@ def ShowRoot(plugin):
 	vod.setLabel(vod_title)
 	vod.setProperty('IsPlayable', 'false')
 	vod.setInfo( type='video', infoLabels={'title': vod_title, 'plot': __language__(30016)})
+
 	xbmcplugin.addDirectoryItem(handle,uri % VIDEOTEKA,vod,True)
 	
 	set_title = ' [  %s  ] ' % __language__(30004)
@@ -724,7 +751,7 @@ def VideoLib(plugin, params):
 	
 	
 	if do == 'Play':
-	
+		
 		last_update = __settings__.getSetting('video_last_update') or '0000-00-00 00:00:00'
 		if last_update == '0000-00-00 00:00:00':
 			dialog = xbmcgui.Dialog()
@@ -791,7 +818,7 @@ def MovieLib(plugin, do):
 		xbmc.log('[%s] progress step size set to %s as 60 / %s' % (PLUGIN_NAME, stepSize, len(toprocess)), level=xbmc.LOGDEBUG)
 		counter = 0
 		for vod in toprocess:
-			# [Ilya] i keep getting disconnected when indexing, so i added this line to run every 10 items processed
+			# [glareff] i keep getting disconnected when indexing, so i added this line to run every 10 items processed
 			if(counter % 10 < 1):
 				xbmc.log('\nAuthenticating preventively\n')
 				plugin._auth(plugin.login,plugin.password)
@@ -911,7 +938,10 @@ else:
 
 	elif mode == 'VideoLib':
 		VideoLib(PLUGIN_CORE, params)
-
+	
+	elif mode == 'SelectGenre':
+		SelectGenres(PLUGIN_CORE, params)
+	
 	elif mode == 'Video':
 		Video(PLUGIN_CORE, params)
 
