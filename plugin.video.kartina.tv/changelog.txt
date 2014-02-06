@@ -1,3 +1,8 @@
+[B]1.3.4[/B]
+Added option to toggle visual clue (*) next to channels that have an archive (by [B]glareff[/B])
+os.getcwd() deprecated, fixed as recommended (by [B]glareff[/B])
+Enforce https on login (by [B]glareff[/B])
+
 [B]1.3.3[/B]
 Movie library compatibility with XBMC 12 (by [B]glareff[/B])
 
