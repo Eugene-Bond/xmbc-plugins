@@ -1,3 +1,6 @@
+[B]1.3.5[/B]
+XBMC 13 Gotham compatibility
+
 [B]1.3.4[/B]
 Added option to toggle visual clue (*) next to channels that have an archive (by [B]glareff[/B])
 os.getcwd() deprecated, fixed as recommended (by [B]glareff[/B])
