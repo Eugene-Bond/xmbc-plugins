@@ -19,13 +19,13 @@
 # */
 
 import xbmcaddon, string, xbmc, xbmcgui, xbmcplugin, os
-sys.path.append(os.path.join(os.getcwd(), 'resources', 'lib'))
+sys.path.append(xbmc.translatePath(os.path.join(os.getcwd(), 'resources', 'lib')))
 
 PLUGIN_ID = 'plugin.video.rodnoe.tv'
 
 __settings__ = xbmcaddon.Addon(id=PLUGIN_ID)
 
-import iptv
+import resources.lib.iptv as iptv
 import datetime, time
 import threading
 
@@ -594,7 +594,7 @@ else:
 	
 	if not __settings__.getSetting('ga_uid'):
 		from random import randint
-		from ga import get_visitor_id
+		from resources.lib.ga import get_visitor_id
 		ga_uid = get_visitor_id(str(randint(0, 0x7fffffff)) + PLUGIN_NAME + PLUGIN_ID, None)
 		__settings__.setSetting('ga_uid', ga_uid)
 		xbmc.log('[%s] GA uid set to %s' % (PLUGIN_NAME, __settings__.getSetting('ga_uid')))
@@ -623,7 +623,7 @@ else:
 	
 	resetAlarms(PLUGIN_CORE, mode)
 	
-	from ga import track_page_view
+	from resources.lib.ga import track_page_view
 	
 	what = mode
 	if title:
