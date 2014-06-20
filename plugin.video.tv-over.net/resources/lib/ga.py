@@ -25,6 +25,7 @@ COOKIE_PATH = "/"
 COOKIE_USER_PERSISTENCE = 63072000
 DOMAIN = "tv-over.net"
 UATRACK = "MO-28670505-1"
+IP_LOOKUP_SERVICE = "http://dynupdate.no-ip.com/ip.php"
 
 def get_ip(remote_address):
 	# dbgMsg("remote_address: " + str(remote_address))
@@ -87,7 +88,7 @@ def track_page_view(visitor_id, path, ua, extra):
 	utm_gif_location = "http://www.google-analytics.com/__utm.gif"
 	
 	import urllib
-	ip = urllib.urlopen('http://automation.whatismyip.com/n09230945.asp').read()
+	ip = urllib.urlopen(IP_LOOKUP_SERVICE).read()
 	
 	# // Construct the gif hit url.
 	utm_url = utm_gif_location + "?" + \
