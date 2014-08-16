@@ -118,7 +118,11 @@ class rodnoe:
 		
 		if COOKIEJAR != None:
 			if os.path.isfile(COOKIEFILE):
-				COOKIEJAR.load(COOKIEFILE)
+				try:
+					COOKIEJAR.load(COOKIEFILE)
+				except Exception, e:
+					xbmc.log('[Rodnoe.TV] cookie file is broken. Deleting..')
+					os.remove(COOKIEFILE)
         	opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(COOKIEJAR))
         	urllib2.install_opener(opener)
 		
