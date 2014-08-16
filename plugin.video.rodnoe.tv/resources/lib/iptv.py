@@ -333,8 +333,11 @@ class rodnoe:
 					'aspect_ratio': aspect_ratio,
 					'servertime': servertime,
 					'color':	color,
+					'order':	channel['number'] or 9999,
 				})
-		
+				
+		res.sort(key=lambda x: (x['order']))
+				
 		self.last_list = self.last_list = {'channels': res, 'ttl': time() + 600}
 		f = open(LASTLISTFILE, 'wb')
 		try:
