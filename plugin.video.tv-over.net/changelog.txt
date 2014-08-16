@@ -1,3 +1,8 @@
+[B]1.2.0[/B]
+Proper channels order in the list
+Autorecovery if cookie file was broken
+GeoIP service provider changed
+
 [B]1.1.1[/B]
 XBMC 13 Gotham compatibility
 
