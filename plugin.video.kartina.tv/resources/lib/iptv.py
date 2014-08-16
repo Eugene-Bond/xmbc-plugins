@@ -135,11 +135,15 @@ class kartina:
 		
 		self.last_list = None
 		
-		if COOKIEJAR != None:
-			if os.path.isfile(COOKIEFILE):
+		if os.path.isfile(COOKIEFILE):
+			try:
 				COOKIEJAR.load(COOKIEFILE)
-        	opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(COOKIEJAR))
-        	urllib2.install_opener(opener)
+			except Exception, e:
+				xbmc.log('[Kartina.TV] cookie file is broken. Deleting..')
+				os.remove(COOKIEFILE)
+        	
+		opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(COOKIEJAR))
+		urllib2.install_opener(opener)
 		
 		self.supported_settings = {'stream_server': {'name': 'stream_server', 'language_key': 34001, 'lookup': 'ip', 'display': 'descr'}, 'timeshift': {'name': 'timeshift', 'language_key': 34002}, 'bitrate': {'name': 'bitrate', 'language_key': 34004}, 'timezone': {'name': 'timezone', 'language_key': 34003, 'defined': [('-12', '-12 GMT (New Zealand Standard Time)'), ('-11', '-11 GMT (Midway Islands Time)'), ('-10', '-10 GMT (Hawaii Standard Time)'), ('-9', '-9 GMT (Alaska Standard Time)'), ('-8', '-8 GMT (Pacific Standard Time)'), ('-7', '-7 GMT (Mountain Standard Time)'), ('-6', '-6 GMT (Central Standard Time)'), ('-5', '-5 GMT (Eastern Standard Time)'), ('-4', '-4 GMT (Puerto Rico and US Virgin Islands Time)'), ('-3', '-3 GMT (Argentina Standard Time)'), ('-2', '-2 GMT'), ('-1', '-1 GMT (Central African Time)'), ('0', '0 GMT (Greenwich Mean Time)'), ('1', '+1 GMT (European Central Time)'), ('2', '+2 GMT (Eastern European Time)'), ('3', '+3 GMT (Eastern African Time)'), ('4', '+4 GMT (Near East Time)'), ('5', '+5 GMT (Pakistan Lahore Time)'), ('6', '+6 GMT (Bangladesh Standard Time)'), ('7', '+7 GMT (Vietnam Standard Time)'), ('8', '+8 GMT (China Taiwan Time)'), ('9', '+9 GMT (Japan Standard Time)'), ('10', '+10 GMT (Australia Eastern Time)'), ('11', '+11 GMT (Solomon Standard Time)')]}}
 		
