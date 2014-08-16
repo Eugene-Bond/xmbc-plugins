@@ -458,15 +458,19 @@ class kartina:
 			
 		return res
 	
-	def getVideoInfo(self, id):
+	def getVideoInfo(self, id, code = None):
 		params = 'id=%s' % id
+		if code != None:
+			params += '&protect_code=%s' % code
 		result = self._request('vod_info', params)
 		
 		return result['film']
 	
 	
-	def getVideoUrl(self, id):
+	def getVideoUrl(self, id, code = None):
 		params = 'fileid=%s' % id
+		if code != None:
+			params += '&protect_code=%s' % code
 		response = self._request('vod_geturl', params)
 		url = response['url']
 		

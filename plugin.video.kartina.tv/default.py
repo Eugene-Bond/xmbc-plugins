@@ -333,7 +333,7 @@ def Video(plugin, params):
 		page = 1
 	
 	genreParam=''
-	genre=''
+	genre=None
 	if 'genre' in params:
 		genre = params['genre']
 		genreParam = '&genre=%s' % genre
@@ -350,7 +350,7 @@ def Video(plugin, params):
 		xbmcplugin.addDirectoryItem(handle,uri,goback,True)
 	
 	
-	vlist = plugin.getVideoList(mode, page, genre, 50)
+	vlist = plugin.getVideoList(mode, page, genre, 'all')
 	
 	for film in vlist:
 		title = film['title']
@@ -379,7 +379,7 @@ def Video(plugin, params):
 
 def VideoInfo(plugin, params):
 	vid = params['vod']
-	film = plugin.getVideoInfo(vid)
+	film = plugin.getVideoInfo(vid, __settings__.getSetting('protected_code'))
 	
 	for video in film['videos']:
 		xbmc.log('[%s] VODs list item: %s' % (PLUGIN_NAME, video))
@@ -401,7 +401,7 @@ def VideoInfo(plugin, params):
 
 def WatchVOD(plugin, params):
 	vod = params['vod']
-	url = plugin.getVideoUrl(vod)
+	url = plugin.getVideoUrl(vod, __settings__.getSetting('protected_code'))
 	xbmc.log('[%s] WatchVOD: Opening video %s as %s' % (PLUGIN_NAME, id, url))
 	item=xbmcgui.ListItem(params['title'], path=url)
 	item.setInfo( type='video', infoLabels={'title': params['title']})
