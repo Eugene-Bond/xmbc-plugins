@@ -120,7 +120,7 @@ class tvover:
 				try:
 					COOKIEJAR.load(COOKIEFILE)
 				except Exception, e:
-					xbmc.log('[Rodnoe.TV] cookie file is broken. Deleting..')
+					xbmc.log('[TV-Over.NET] cookie file is broken. Deleting..')
 					os.remove(COOKIEFILE)
         	
         	opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(COOKIEJAR))
@@ -241,13 +241,13 @@ class tvover:
 				message = err['message']
 				if message == None:
 					message = err['code']
-				xbmc.log('[Rodnoe.TV] ERROR: %s' % message.encode('utf8'))
+				xbmc.log('[TV-Over.NET] ERROR: %s' % message.encode('utf8'))
 				self.AUTH_OK = False
 	
 	def getLast(self):
 		if self.last_list and 'ttl' in self.last_list:
 			if int(self.last_list['ttl']) < time():
-				xbmc.log('[Rodnoe.TV] Last list expired')
+				xbmc.log('[TV-Over.NET] Last list expired')
 				self.last_list = None
 		if not self.last_list:
 			f = open(LASTLISTFILE, 'rb')
