@@ -116,9 +116,13 @@ class tvover:
 		self.SID_NAME = SID_NAME
 		self.AUTH_OK = False
 		
-		if COOKIEJAR != None:
-			if os.path.isfile(COOKIEFILE):
-				COOKIEJAR.load(COOKIEFILE)
+		if os.path.isfile(COOKIEFILE):
+				try:
+					COOKIEJAR.load(COOKIEFILE)
+				except Exception, e:
+					xbmc.log('[Rodnoe.TV] cookie file is broken. Deleting..')
+					os.remove(COOKIEFILE)
+        	
         	opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(COOKIEJAR))
         	urllib2.install_opener(opener)
 		
@@ -332,8 +336,10 @@ class tvover:
 					'epg_end':	epg_end,
 					'aspect_ratio': aspect_ratio,
 					'servertime': servertime,
-					'color':	color,
+					'color':	color,'order':	channel['number'] or 9999,
 				})
+				
+		res.sort(key=lambda x: (x['order']))
 		
 		self.last_list = self.last_list = {'channels': res, 'ttl': time() + 600}
 		f = open(LASTLISTFILE, 'wb')
