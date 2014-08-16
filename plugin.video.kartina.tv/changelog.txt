@@ -1,3 +1,7 @@
+[B]1.3.6[/B]
+Autorecovery if cookie file is broken
+Access to protected video files in video library
+
 [B]1.3.5[/B]
 XBMC 13 Gotham compatibility
 
