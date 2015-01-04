@@ -1,3 +1,7 @@
+[B]1.4.0[/B]
+Added support of the video library
+Added support of channel's categories
+
 [B]1.3.3[/B]
 Proper channels order in the list
 Autorecovery if cookie file was broken (https://github.com/Eugene-Bond/xmbc-plugins/issues/10)

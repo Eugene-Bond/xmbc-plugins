@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*
 # Rodnoe.TV python class
-# (c) Eugene Bond, 2010-2012
+# (c) Eugene Bond, 2010-2015
 # eugene.bond@gmail.com
 
 import urllib2
@@ -10,10 +10,9 @@ import re, os, sys
 from time import time
 
 __author__ = 'Eugene Bond <eugene.bond@gmail.com>'
-__version__ = '1.10'
+__version__ = '1.20'
 
 IPTV_DOMAIN = 'file-teleport.com'
-#IPTV_DOMAIN = 'core.sogno.tv'
 IPTV_API = 'http://%s/iptv/api/v1/json/%%s' % IPTV_DOMAIN
 
 
@@ -192,7 +191,7 @@ class rodnoe:
 		except:
 			xbmc.log('[Rodnoe.TV] Error.. :(')
 			
-		#xbmc.log('[Rodnoe.TV] Got JSON: %s' % res)
+		xbmc.log('[Rodnoe.TV] Got JSON: %s' % res)
 		
 		self._errors_check(res)
 		
@@ -274,7 +273,7 @@ class rodnoe:
 	def fixTime(self, gmt, adjust = 0):
 		return gmt + adjust#+ self.time_zone * 60 
 	
-	def getChannelsList(self):
+	def getChannelsList(self, filterGroup = None):
 		self.initTimeFix()
 		
 		response = self._request('get_list_tv', 'with_epg=1&time_shift=%s' % (self.timeshift))
@@ -285,6 +284,9 @@ class rodnoe:
 		
 		res = []
 		for group in response['groups']:
+			if filterGroup:
+				if int(filterGroup) != int(group['id']):
+					continue
 			color = self._resolveColor(group['color'])
 			for channel in group['channels']:
 				icon = re.sub('%ICON%', channel['icon'], response['icons']['w40h30'])
@@ -410,6 +412,11 @@ class rodnoe:
 			
 		return res
 	
+	def getTVCategories(self):
+		res = self._request('get_groups_tv', '')
+		return res
+		
+	
 	def getStreamUrl(self, id, gmt = None, code = None): 
 		self.initTimeFix()
 		
@@ -471,8 +478,65 @@ class rodnoe:
 			})
 		xbmc.log('[Rodnoe.TV] settings: %s' % res)
 		return res
-
 	
+	def getGenresList(self):
+		res = self._request('get_genre_movie', '')
+		return res
+	
+	def getVideoList(self, page, genre, pagesize=50, search={}):
+		if pagesize == 'all':
+			pagesize = 999
+			page = 1
+			params = 'genre=%s&limit=%s&page=%s' % (genre, 1, 1)
+			result = self._request('get_list_movie', params)
+			if 'options' in result:
+				if 'count' in result['options']:
+					pagesize = result['options']['count'] 
+			xbmc.log('[Rodnoe.TV] pagesize set to %s to reflect "all" param' % pagesize)
+		
+		genreParam= ''
+		if(genre):
+			genreParam='&genre=%s' % genre
+			
+		
+		params = 'limit=%s&page=%s&extended=1%s' % (pagesize, page,genreParam)
+		
+		result = self._request('get_list_movie', params)
+		res = []
+		if 'groups' in result:
+			for vod in result['groups']:
+				if 'pic' in vod:
+					icon = vod['pic']
+					if icon[:4] != 'http':
+						icon = 'http://%s%s' % (IPTV_DOMAIN, icon)
+				else:
+					icon = ''
+				xbmc.log('[Rodnoe.TV] VOD item: %s' % vod, level=xbmc.LOGDEBUG)
+				res.append({
+					'title':		vod['title'],
+					'info':			vod['description'],
+					'is_video':		1,
+					'id':			vod['id'],
+					'genre':		vod['genre'],
+					'icon':			icon,
+					'source':		vod
+				})
+		else:
+			#error
+			pass
+					
+		return res
+	
+	def getVideoUrl(self, id, code = None):
+		params = 'cid=%s' % id
+		if code != None:
+			params += '&protect_code=%s' % code
+		response = self._request('get_url_movie', params)
+		url = response['url']
+		
+		#url, junk = url.split(" ",1)
+		
+		return url
 	
 	def test(self):
 		
