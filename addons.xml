@@ -21,7 +21,7 @@
 
 <addon id="plugin.video.rodnoe.tv"
        name="Rodnoe.TV"
-       version="1.3.3"
+       version="1.4.0"
        provider-name="Eugene Bond">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
