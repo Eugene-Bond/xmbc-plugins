@@ -1,3 +1,6 @@
+[B]1.4.1[/B]
+Added direct access to the archive from the root menu
+
 [B]1.4.0[/B]
 Added support of the video library
 Added support of channel's categories
