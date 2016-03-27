@@ -285,7 +285,7 @@ class rodnoe:
 		res = []
 		for group in response['groups']:
 			if filterGroup:
-				if int(filterGroup) != int(group['id']):
+				if filterGroup != group['alias']:
 					continue
 			color = self._resolveColor(group['color'])
 			for channel in group['channels']:
