@@ -44,8 +44,11 @@
 	<string id="30041">Favourites only</string>
 	<string id="30042">All TV channels</string>
 	<string id="30043">Auto detect current timezone</string>
-	<string id="30044">All new movies</string>
+	<string id="30044">All</string>
 	<string id="30045">Channels categories</string>
+    <string id="30046">Movies</string>
+    <string id="30047">Collections</string>
+    <string id="30048">TV Series</string>
 	<string id="31001">General settings</string>
 	<string id="31002">Channels list</string>
 	<string id="34001">Streaming server</string>
