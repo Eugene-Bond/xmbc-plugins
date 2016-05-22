@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*
 # Rodnoe.TV python class
-# (c) Eugene Bond, 2010-2015
+# (c) Eugene Bond, 2010-2016
 # eugene.bond@gmail.com
 
 import urllib2
@@ -10,7 +10,7 @@ import re, os, sys
 from time import time
 
 __author__ = 'Eugene Bond <eugene.bond@gmail.com>'
-__version__ = '1.20'
+__version__ = '1.21'
 
 IPTV_DOMAIN = 'file-teleport.com'
 IPTV_API = 'http://%s/iptv/api/v1/json/%%s' % IPTV_DOMAIN
@@ -122,8 +122,8 @@ class rodnoe:
 				except Exception, e:
 					xbmc.log('[Rodnoe.TV] cookie file is broken. Deleting..')
 					os.remove(COOKIEFILE)
-        	opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(COOKIEJAR))
-        	urllib2.install_opener(opener)
+			opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(COOKIEJAR))
+			urllib2.install_opener(opener)
 		
 		self.media_key = None
 		self.login = login
@@ -483,23 +483,26 @@ class rodnoe:
 		res = self._request('get_genre_movie', '')
 		return res
 	
-	def getVideoList(self, page, genre, pagesize=50, search={}):
+	def getVideoList(self, page, genre, videoType=0, parent=0, pagesize=50, search={}):
 		if pagesize == 'all':
 			pagesize = 999
 			page = 1
-			params = 'genre=%s&limit=%s&page=%s' % (genre, 1, 1)
+			params = 'genre=%s&type=%s&parent=%s&limit=%s&page=%s' % (genre, videoType, parent, 1, 1)
 			result = self._request('get_list_movie', params)
 			if 'options' in result:
 				if 'count' in result['options']:
 					pagesize = result['options']['count'] 
 			xbmc.log('[Rodnoe.TV] pagesize set to %s to reflect "all" param' % pagesize)
 		
-		genreParam= ''
+		addParam = ''
+		if parent:
+			addParam = '&parent=%s' % parent
+		if videoType:
+			addParam = '&type=%s' % videoType
 		if(genre):
-			genreParam='&genre=%s' % genre
-			
-		
-		params = 'limit=%s&page=%s&extended=1%s' % (pagesize, page,genreParam)
+			addParam ='&genre=%s&type=%s' % (genre, videoType)
+
+		params = 'limit=%s&page=%s&extended=1%s' % (pagesize, page,addParam)
 		
 		result = self._request('get_list_movie', params)
 		res = []

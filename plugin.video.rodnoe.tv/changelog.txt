@@ -1,3 +1,6 @@
+[B]1.5.0[/B]
+Video Library now supports TV Series and Collections
+
 [B]1.4.1[/B]
 Added direct access to the archive from the root menu
 

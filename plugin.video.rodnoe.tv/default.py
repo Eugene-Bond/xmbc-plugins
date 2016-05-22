@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*
 #/*
-# *      Copyright (C) 2010-2015 Eugene Bond <eugene.bond@gmail.com>
+# *      Copyright (C) 2010-2016 Eugene Bond <eugene.bond@gmail.com>
 # *
 # *  This Program is free software; you can redistribute it and/or modify
 # *  it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ PLUGIN_CORE = None
 TRANSSID = ''
 thumb = os.path.join( os.getcwd(), "icon.png" )
 
-VIDEOTEKA = 'SelectGenre'
+VIDEOTEKA = 'SelectVideoType'
 
 def get_params():
 	param=[]
@@ -576,14 +576,14 @@ def ProcessSettings(plugin, params):
 		selection = []
 		for opval, opname in options:
 			selection.append(opname)
-  		ret = dialog.select(params['title'], selection)
-  		counter = 0
-  		for opval, opname in options:
-  			if counter == ret:
-  				plugin.setSettingCurrent(params['name'], opval)
-  			counter = counter + 1
-  		xbmc.executebuiltin('Container.Refresh')
-  		
+		ret = dialog.select(params['title'], selection)
+		counter = 0
+		for opval, opname in options:
+			if counter == ret:
+				plugin.setSettingCurrent(params['name'], opval)
+			counter = counter + 1
+		xbmc.executebuiltin('Container.Refresh')
+
 	else:
 		settings = plugin.getSettingsList()
 		
@@ -629,19 +629,35 @@ def ShowTVCategories(plugin, params):
 	
 	xbmcplugin.endOfDirectory(handle,True,False)
 
+def SelectTypes(plugin, params):
+	xbmc.log('Select types screen initiated')
+	title = "[COLOR dd00ff00]%s[/COLOR]" % __language__(30046)
+	item=xbmcgui.ListItem(title)
+	uri = sys.argv[0] + '?mode=SelectGenre&type=1'
+	xbmcplugin.addDirectoryItem(handle,uri,item,True)
+	title = "[COLOR dd00ff00]%s[/COLOR]" % __language__(30047)
+	item=xbmcgui.ListItem(title)
+	uri = sys.argv[0] + '?mode=SelectGenre&type=5'
+	xbmcplugin.addDirectoryItem(handle,uri,item,True)
+	title = "[COLOR dd00ff00]%s[/COLOR]" % __language__(30048)
+	item=xbmcgui.ListItem(title)
+	uri = sys.argv[0] + '?mode=SelectGenre&type=6'
+	xbmcplugin.addDirectoryItem(handle,uri,item,True)
+	xbmcplugin.endOfDirectory(handle,True,False)
+
 def SelectGenres(plugin, params):
 	xbmc.log('Select genres screen initiated')
 	glist = plugin.getGenresList();
 	
 	title = "[COLOR dd00ff00]%s[/COLOR]" % __language__(30044)
 	item=xbmcgui.ListItem(title)
-	uri = sys.argv[0] + '?mode=Video'
+	uri = sys.argv[0] + '?mode=Video&type=%s' % params['type']
 	xbmcplugin.addDirectoryItem(handle,uri,item,True)
 	
 	for genre in glist['groups']:
 		title = genre['title']
 		item=xbmcgui.ListItem(title)
-		uri = sys.argv[0] + '?mode=Video&genre=%s' % (genre['id'])
+		uri = sys.argv[0] + '?mode=Video&genre=%s&type=%s' % (genre['id'], params['type'])
 		xbmcplugin.addDirectoryItem(handle,uri,item,True)
 	
 	xbmcplugin.endOfDirectory(handle,True,False)
@@ -657,23 +673,32 @@ def Video(plugin, params):
 	
 	genreParam=''
 	genre=None
+	typeParam=''
+	videoType=None
+	parent=None
+	parentParam=''
+	xbmc.log('[%s] Processing video list (%s)' % (PLUGIN_NAME, params))
 	if 'genre' in params:
 		genre = params['genre']
 		genreParam = '&genre=%s' % genre
-	
-	
+	if 'type' in params:
+		videoType=params['type']
+		typeParam = '&type=%s' % videoType
+	if 'parent' in params:
+		parent = params['parent']
+
 	if page > 1:
 		goback_title = '[COLOR dd00ffff][ %s ][/COLOR]' % __language__(30019)
 		goback = xbmcgui.ListItem(goback_title)
 		goback.setLabel(goback_title)
 		goback.setProperty('IsPlayable', 'false')
 		goback.setInfo( type='video', infoLabels={'title': goback_title})
-		uri = sys.argv[0] + '?mode=Video&page=%d%s' % (page-1,genreParam)
+		uri = sys.argv[0] + '?mode=Video&page=%d%s%s%s' % (page-1,genreParam,typeParam,parentParam)
 		xbmc.log(uri) 
 		xbmcplugin.addDirectoryItem(handle,uri,goback,True)
 	
 	
-	vlist = plugin.getVideoList(page, genre)
+	vlist = plugin.getVideoList(page, genre, videoType, parent)
 	
 	for film in vlist:
 		title = film['title']
@@ -686,9 +711,19 @@ def Video(plugin, params):
 		else:
 			duration = None
 		item.setInfo( type='video', infoLabels={'title': title, 'plot': film['info'], 'duration': duration, 'year': film['source']['year']})
-		uri = sys.argv[0] + '?mode=WatchVOD&vod=%s&title=%s&duration=%s' % (film['id'], title, duration)
-		item.setProperty('IsPlayable', 'true')
-		xbmcplugin.addDirectoryItem(handle,uri,item,False)
+		isDrillable = False
+		if 'type' in film['source']:
+			xbmc.log('[%s] Type of %s = %s' % (PLUGIN_NAME, film['id'], film['source']['type']))
+			if int(film['source']['type']) != 1 and int(film['source']['type']) != 4:
+				isDrillable = True
+		if isDrillable:
+			uri = sys.argv[0] + '?mode=Video&parent=%d' % int(film['id'])
+			item.setProperty('IsPlayable', 'false')
+			xbmcplugin.addDirectoryItem(handle,uri,item,True)
+		else:
+			uri = sys.argv[0] + '?mode=WatchVOD&vod=%s&title=%s&duration=%s' % (film['id'], title, duration)
+			item.setProperty('IsPlayable', 'true')
+			xbmcplugin.addDirectoryItem(handle,uri,item,False)
 	
 	
 	goahead_title = '[COLOR dd00ffff][ %s ][/COLOR]' % __language__(30018)
@@ -696,9 +731,9 @@ def Video(plugin, params):
 	goahead.setLabel(goahead_title)
 	goahead.setProperty('IsPlayable', 'false')
 	goahead.setInfo( type='video', infoLabels={'title': goahead_title})
-	uri = sys.argv[0] + '?mode=Video&page=%d%s' % (page+1,genreParam)
+	uri = sys.argv[0] + '?mode=Video&page=%d%s%s%s' % (page+1,genreParam,typeParam,parentParam)
 	
-	if(vlist):
+	if(vlist) and not parent:
 		if len(vlist)>49:
 			xbmcplugin.addDirectoryItem(handle,uri,goahead,True)
 		
@@ -808,6 +843,9 @@ else:
 	elif mode == 'SelectGenre':
 		SelectGenres(PLUGIN_CORE, params)
 	
+	elif mode == 'SelectVideoType':
+		SelectTypes(PLUGIN_CORE, params)
+
 	elif mode == 'Video':
 		Video(PLUGIN_CORE, params)
 
