@@ -20,28 +20,28 @@ try:
 	import xbmc, xbmcaddon
 except ImportError:
 	class xbmc_boo:
-		
+
 		def __init__(self):
 			self.nonXBMC = True
 			self.LOGDEBUG = 1
-		
+
 		def output(self, data, level = 0):
 			print "xbmc.output is depricated. use xbmc.log instead"
 			self.log(data, level)
-		
+
 		def log(self, data, level = 0):
 			print data
-		
+
 		def getInfoLabel(self, param):
 			return '%s unknown' % param
-		
+
 		def translatePath(self, param):
 			return './'
-	
+
 	class xbmcaddon_foo:
 		def __init__(self, id):
 			self.id = id
-		
+
 		def getAddonInfo(self, param):
 			if param == 'version':
 				return __version__
@@ -49,13 +49,13 @@ except ImportError:
 				return self.id + ' by %s' % __author__
 			else:
 				return '%s unknown' % param
-	
+
 	class xbmcaddon_boo:
 		def Addon(self, id = ''):
 			if not id:
 				id = os.path.basename(__file__)
 			return xbmcaddon_foo(id)
-	
+
 	xbmc = xbmc_boo()
 	xbmcaddon = xbmcaddon_boo()
 
@@ -67,14 +67,14 @@ except ImportError:
 #	import platform
 #except ImportError:
 class platform_boo:
-	
+
 	def system(self):
 		return os.name
-	
+
 	def release(self):
 		plat = sys.platform
 		return plat
-			
+
 	def python_version(self):
 		ver = sys.version_info
 		return '%s.%s.%s' % (ver[0], ver[1], ver[2])
@@ -86,7 +86,7 @@ COOKIEFILE = os.path.join(xbmc.translatePath('special://temp/'), 'cookie.%s.txt'
 LASTLISTFILE = os.path.join(xbmc.translatePath('special://temp/'), 'last.%s.json' % IPTV_DOMAIN)
 
 try:											# Let's see if cookielib is available
-	import cookielib            
+	import cookielib
 except ImportError:
 	xbmc.log('[Rodnoe.TV] cookielib is not available..')
 	pass
@@ -105,16 +105,16 @@ else:
 	JSONENCODE = json.dumps
 
 class rodnoe:
-	
+
 	def __init__(self, login, password, addonid = '', SID = None, SID_NAME = None):
-		
+
 		if not addonid:
 			addonid = os.path.basename(__file__)
-		
+
 		self.SID = SID
 		self.SID_NAME = SID_NAME
 		self.AUTH_OK = False
-		
+
 		if COOKIEJAR != None:
 			if os.path.isfile(COOKIEFILE):
 				try:
@@ -124,7 +124,7 @@ class rodnoe:
 					os.remove(COOKIEFILE)
 			opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(COOKIEJAR))
 			urllib2.install_opener(opener)
-		
+
 		self.media_key = None
 		self.login = login
 		self.password = password
@@ -134,73 +134,73 @@ class rodnoe:
 		self.addonid = addonid
 		self.last_settings = None
 		self.auto_timezone = False
-		
+
 		self.last_list = None
-		
+
 		self.supported_settings = {'media_server_id': {'name': 'media_server_id', 'language_key': 34001, 'lookup_in': 'media_servers', 'lookup': 'id', 'display': 'title'}, 'time_shift': {'name': 'time_shift', 'language_key': 34002, 'defined': [('0', '0'), ('60', '1'), ('120', '2'), ('180', '3'), ('240', '4'), ('300', '5'), ('360', '6'), ('420', '7'), ('480', '8'), ('540', '9'), ('600', '10'), ('660', '11'), ('720', '12')]}, 'time_zone': {'name': 'time_zone', 'language_key': 34003, 'defined': [('-720', '-12 GMT (New Zealand Standard Time)'), ('-660', '-11 GMT (Midway Islands Time)'), ('-600', '-10 GMT (Hawaii Standard Time)'), ('-540', '-9 GMT (Alaska Standard Time)'), ('-480', '-8 GMT (Pacific Standard Time)'), ('-420', '-7 GMT (Mountain Standard Time)'), ('-360', '-6 GMT (Central Standard Time)'), ('-300', '-5 GMT (Eastern Standard Time)'), ('-240', '-4 GMT (Puerto Rico and US Virgin Islands Time)'), ('-180', '-3 GMT (Argentina Standard Time)'), ('-120', '-2 GMT'), ('-60', '-1 GMT (Central African Time)'), ('0', '0 GMT (Greenwich Mean Time)'), ('60', '+1 GMT (European Central Time)'), ('120', '+2 GMT (Eastern European Time)'), ('180', '+3 GMT (Eastern African Time)'), ('240', '+4 GMT (Near East Time)'), ('300', '+5 GMT (Pakistan Lahore Time)'), ('360', '+6 GMT (Bangladesh Standard Time)'), ('420', '+7 GMT (Vietnam Standard Time)'), ('480', '+8 GMT (China Taiwan Time)'), ('540', '+9 GMT (Japan Standard Time)'), ('600', '+10 GMT (Australia Eastern Time)'), ('660', '+11 GMT (Solomon Standard Time)')]}}
-		
+
 		self.COLORSCHEMA = {'#000000': 'ddffffff'}	# default black looks not great on black background
 		self.time_zone = 0
-	
+
 	def genUa(self):
 		osname = '%s %s; %s' % (platform.system(), platform.release(), platform.python_version())
 		pyver = platform.python_version()
-		
+
 		__settings__ = xbmcaddon.Addon(self.addonid)
-		
+
 		isXBMC = 'RODNOE-XBMC'
 		if getattr(xbmc, "nonXBMC", None) is not None:
 			isXBMC = 'RODNOE-nonXBMC'
-		
+
 		#ua = '%s v%s (%s %s [%s]; %s; python %s) as %s' % (__settings__.getAddonInfo('id'), __settings__.getAddonInfo('version'), isXBMC, xbmc.getInfoLabel('System.BuildVersion'), xbmc.getInfoLabel('System.ScreenMode'), osname, pyver, self.login)
-		
+
 		ua = '%s/%s (%s; %s) %s/%s iptv/%s user/%s' % (isXBMC, xbmc.getInfoLabel('System.BuildVersion').split(" ")[0], xbmc.getInfoLabel('System.BuildVersion'), osname, __settings__.getAddonInfo('id'), __settings__.getAddonInfo('version'), __version__, self.login)
-		
+
 		xbmc.log('[Rodnoe.TV] UA: %s' % ua)
 		return ua
-		
+
 	def _request(self, cmd, params, inauth = None):
-		
+
 		if self.AUTH_OK == False:
 			if inauth == None:
 				self._auth(self.login, self.password)
-		
+
 		url = IPTV_API % cmd
 		if inauth:
 			postparams = params
 		else:
 			url = url + '?' + params
 			postparams = None
-		
+
 		xbmc.log('[Rodnoe.TV] Requesting %s' % url);
-		
+
 		ua = self.genUa()
-		
+
 		req = urllib2.Request(url, postparams, {'User-agent': ua, 'Connection': 'Close', 'Accept': 'application/json, text/javascript, */*', 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/x-www-form-urlencoded'})
-		
+
 		if COOKIEJAR == None and (self.SID != None):
 			req.add_header("Cookie", self.SID_NAME + "=" + self.SID + ";")
-		
+
 		rez = urllib2.urlopen(req).read()
-		
+
 		xbmc.log('[Rodnoe.TV] Got %s' % rez, level=xbmc.LOGDEBUG)
-		
-		
+
+
 		try:
 			res = JSONDECODE(rez)
 		except:
 			xbmc.log('[Rodnoe.TV] Error.. :(')
-			
+
 		xbmc.log('[Rodnoe.TV] Got JSON: %s' % res)
-		
+
 		self._errors_check(res)
-		
+
 		if COOKIEJAR != None:
 			xbmc.log('[Rodnoe.TV] Saving cookies: %s' % COOKIEFILE)
 			COOKIEJAR.save(COOKIEFILE)
-		
+
 		return res
-	
+
 	def initTimeFix(self):
 		import time
 		(val, opt) = self.getSettingCurrent('time_zone')
@@ -215,24 +215,24 @@ class rodnoe:
 		(val, opt) = self.getSettingCurrent('time_shift')
 		self.timeshift = int(val)
 		xbmc.log('[Rodnoe.TV] time shift set to %s' % self.timeshift)
-	
+
 	def _auth(self, user, password):
-		
+
 		md5pass = md5(md5(self.login).hexdigest() + md5(self.password).hexdigest()).hexdigest()
-		
+
 		response = self._request('login', 'login=%s&pass=%s' % (self.login, md5pass), 1)
 		self.AUTH_OK = False
-		
+
 		if 'sid' in response:
 			self.SID = response['sid']
 			self.SID_NAME = 'sid'#response['sid_name']
-			
+
 			#if COOKIEJAR != None:
 			#	auth_cookie = cookielib.Cookie(version=0, name=self.SID_NAME, value=self.SID)
 			#	COOKIEJAR.set_cookie(auth_cookie)
-			
+
 			self.AUTH_OK = True
-				
+
 	def _errors_check(self, json):
 		if 'error' in json:
 			err = json['error']
@@ -242,7 +242,7 @@ class rodnoe:
 					message = err['code']
 				xbmc.log('[Rodnoe.TV] ERROR: %s' % message.encode('utf8'))
 				self.AUTH_OK = False
-	
+
 	def getLast(self):
 		if self.last_list and 'ttl' in self.last_list:
 			if int(self.last_list['ttl']) < time():
@@ -258,30 +258,30 @@ class rodnoe:
 			else:
 				xbmc.log('[Rodnoe.TV] last list loaded')
 			f.close()
-			
+
 		return self.last_list['channels']
-	
+
 	def testAuth(self):
 		self.AUTH_OK = True
 		account = self._request('get_account_info', '')
-			
+
 		if not self.AUTH_OK:
 			self._auth(self.login, self.password)
-		
+
 		return self.AUTH_OK
-	
+
 	def fixTime(self, gmt, adjust = 0):
-		return gmt + adjust#+ self.time_zone * 60 
-	
+		return gmt + adjust#+ self.time_zone * 60
+
 	def getChannelsList(self, filterGroup = None):
 		self.initTimeFix()
-		
+
 		response = self._request('get_list_tv', 'with_epg=1&time_shift=%s' % (self.timeshift))
 		if 'servertime' in response:
-			servertime = self.fixTime(int(response['servertime'])) 
+			servertime = self.fixTime(int(response['servertime']))
 		else:
 			servertime = time();
-		
+
 		res = []
 		for group in response['groups']:
 			if filterGroup:
@@ -294,7 +294,7 @@ class rodnoe:
 				epg_end = 0;
 				epg_title = ""
 				epg_info = ""
-				
+
 				if "epg" in channel and "current" in channel["epg"]:
 					if 'time_shift' in channel["epg"]:
 						ts_fix = int(channel["epg"]["time_shift"])
@@ -302,25 +302,25 @@ class rodnoe:
 						ts_fix = 0
 					prog = channel["epg"]["current"]
 					if 'begin' in prog and prog['begin']:
-						epg_start = self.fixTime(int(prog['begin']), ts_fix)	
+						epg_start = self.fixTime(int(prog['begin']), ts_fix)
 					if 'end' in prog and prog['end']:
 						epg_end = self.fixTime(int(prog['end']), ts_fix)
 					if 'info' in prog:
 						epg_info = prog['info']
 					if 'title' in prog:
 						epg_title = prog['title']
-				
-					
+
+
 				duration = epg_end - epg_start
 				percent = 0
 				if duration > 0:
 					percent = (servertime - epg_start) * 100 / duration
-				
+
 				aspect_ratio = None
 				if 'aspect_ratio' in channel:
-					aspect_ratio = channel['aspect_ratio']				
-				
-				res.append({ 
+					aspect_ratio = channel['aspect_ratio']
+
+				res.append({
 					'title':	channel['name'],
 					'id':		channel['id'],
 					'icon':		icon,
@@ -341,9 +341,9 @@ class rodnoe:
 					'color':	color,
 					'order':	channel['number'] or 9999,
 				})
-				
+
 		res.sort(key=lambda x: (x['order']))
-				
+
 		self.last_list = self.last_list = {'channels': res, 'ttl': time() + 600}
 		f = open(LASTLISTFILE, 'wb')
 		try:
@@ -354,27 +354,27 @@ class rodnoe:
 		else:
 			xbmc.log('[Rodnoe.TV] last list stored')
 		f.close()
-		
+
 		return res
-	
+
 	def _resolveColor(self, color = False):
 		if color and color in self.COLORSCHEMA:
 			return self.COLORSCHEMA[color]
-		
+
 		if color:
 			p = re.compile('^#')
 			if re.match(p, str(color)):
 				return re.sub(p, 'ee', str(color))
-		
+
 		return 'eeffffff'	# almost white
-	
+
 	def getEPG(self, chid, dt = None):
 		self.initTimeFix()
-		
+
 		if dt == None:
 			dt = time.replace(0, 0, 0)
-		
-		
+
+
 		response = self._request('get_epg', 'cid=%s&from_uts=%s&hours=24&time_shift=%s' % (chid, dt, self.timeshift))
 		res = []
 		for channel in response['channels']:
@@ -383,73 +383,73 @@ class rodnoe:
 			else:
 				ts_fix = self.timeshift *3600
 			for epg in channel['epg']:
-				res.append({ 
+				res.append({
 					'title':		epg['title'],
 					'time':			self.fixTime(int(epg['begin']), ts_fix),
 					'uts':			int(epg['begin']),
 					'info':			epg['info'],
 					'is_video':		0
 				})
-		return res   
-	
+		return res
+
 	def getCurrentInfo(self, chid):
 		self.initTimeFix()
 		response = self._request('get_epg', 'cid=%s&time_shift=%s' % (chid, self.timeshift))
 		res = []
-		
+
 		for prg in response['channels']:
 			if 'time_shift' in prg:
 				ts_fix = int(prg["time_shift"])
 			else:
 				ts_fix = self.timeshift * 3600
 			for what in ('current', 'next'):
-				res.append({ 
+				res.append({
 					'title':		prg[what]['title'],
 					'time':			self.fixTime(int(prg[what]['begin']), ts_fix),
 					'info':			prg[what]['info'],
 					'is_video':		0
 				})
-			
+
 		return res
-	
+
 	def getTVCategories(self):
 		res = self._request('get_groups_tv', '')
 		return res
-		
-	
-	def getStreamUrl(self, id, gmt = None, code = None): 
+
+
+	def getStreamUrl(self, id, gmt = None, code = None):
 		self.initTimeFix()
-		
+
 		params = 'cid=%s' % id
 		if gmt != None:
 			t = int(time())
 			uts = gmt# - (t - self.fixTime(t))
 			params += '&uts=%s' % uts
-		
+
 		params += '&time_shift=%s' % self.timeshift
-		
+
 		if code != None:
 			params += '&protect_code=%s' % code
-		
+
 		response = self._request('get_url_tv', params)
 		if 'url' in response:
 			return response['url']
-	
+
 	def getSettingCurrent(self, setting_name):
 		setting = self.supported_settings[setting_name]
 		if self.last_settings == None:
 			self.last_settings = self._request('get_settings', '')
-		
+
 		if setting_name in self.last_settings:
 			server_setting = self.last_settings[setting_name]
-			
+
 			oplist = []
 			lookup_in = 'list'
 			if 'lookup_in' in setting:
 				lookup_in = setting['lookup_in']
-			
+
 			if 'defined' in setting:
-				oplist = setting['defined']	
+				oplist = setting['defined']
 			elif lookup_in in self.last_settings:
 				for set in self.last_settings[lookup_in]:
 					if 'lookup' in setting:
@@ -459,12 +459,12 @@ class rodnoe:
 		else:
 			server_setting = 'Error'
 			oplist = []
-			
+
 		return (server_setting, oplist)
-	
+
 	def setSettingCurrent(self, setting_name, setting_value):
 		res = self._request('set', 'var=%s&val=%s' % (setting_name, setting_value))
-	
+
 	def getSettingsList(self):
 		res = []
 		for set in self.supported_settings:
@@ -478,12 +478,12 @@ class rodnoe:
 			})
 		xbmc.log('[Rodnoe.TV] settings: %s' % res)
 		return res
-	
+
 	def getGenresList(self):
 		res = self._request('get_genre_movie', '')
 		return res
-	
-	def getVideoList(self, page, genre, videoType=0, parent=0, pagesize=50, search={}):
+
+	def getVideoList(self, page, genre, videoType=0, parent=0, pagesize=50, search=""):
 		if pagesize == 'all':
 			pagesize = 999
 			page = 1
@@ -491,19 +491,21 @@ class rodnoe:
 			result = self._request('get_list_movie', params)
 			if 'options' in result:
 				if 'count' in result['options']:
-					pagesize = result['options']['count'] 
+					pagesize = result['options']['count']
 			xbmc.log('[Rodnoe.TV] pagesize set to %s to reflect "all" param' % pagesize)
-		
+
 		addParam = ''
 		if parent:
 			addParam = '&parent=%s' % parent
 		if videoType:
 			addParam = '&type=%s' % videoType
 		if(genre):
-			addParam ='&genre=%s&type=%s' % (genre, videoType)
+			addParam ='&genre=%s&type=%s&sort=name&order=1' % (genre, videoType)
+		if search:
+			addParam = '&word=%s' % search
 
 		params = 'limit=%s&page=%s&extended=1%s' % (pagesize, page,addParam)
-		
+
 		result = self._request('get_list_movie', params)
 		res = []
 		if 'groups' in result:
@@ -527,32 +529,32 @@ class rodnoe:
 		else:
 			#error
 			pass
-					
+
 		return res
-	
+
 	def getVideoUrl(self, id, code = None):
 		params = 'cid=%s' % id
 		if code != None:
 			params += '&protect_code=%s' % code
 		response = self._request('get_url_movie', params)
 		url = response['url']
-		
+
 		#url, junk = url.split(" ",1)
-		
+
 		return url
-	
+
 	def test(self):
-		
+
 		print(self.testAuth())
-		
-		channels = self.getChannelsList()    
+
+		channels = self.getChannelsList()
 		print(channels)
 		for channel in channels:
 			print "%s - %s  %s - %s" % (datetime.datetime.fromtimestamp(channel['epg_start']).strftime('%H:%M'), datetime.datetime.fromtimestamp(channel['epg_end']).strftime('%H:%M'), "","")#channel['title'], channel['subtitle'])
-		ch_url = self.getStreamUrl(102) 
+		ch_url = self.getStreamUrl(102)
 
-		
-			
+
+
 if __name__ == '__main__':
 	foo = rodnoe('demo', 'demo')
-	foo.test()   
+	foo.test()
