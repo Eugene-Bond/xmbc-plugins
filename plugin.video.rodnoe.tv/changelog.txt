@@ -1,3 +1,7 @@
+[B]1.5.1[/B]
+Video Library Search
+Video Library sort order improvements
+
 [B]1.5.0[/B]
 Video Library now supports TV Series and Collections
 
@@ -47,7 +51,7 @@ Autoselection of active programme in EPG/Archive view
 Stoped forcing of full list mode
 Auth via HTTP POST (to remove sensitive data from the log)
 Reduced info logging (some stuff moved into debug log level)
-Minor code refactoring 
+Minor code refactoring
 
 [B]1.0.5[/B]
 Improved JSON parsing speed on AppleTV 2
