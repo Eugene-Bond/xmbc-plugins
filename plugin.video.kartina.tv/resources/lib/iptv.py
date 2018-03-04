@@ -15,8 +15,8 @@ __author__ = 'Eugene Bond <eugene.bond@gmail.com>'
 __version__ = '2.10'
 
 IPTV_DOMAIN = 'iptv.kartina.tv'
-IPTV_API = 'http://%s/api/json/%%s' % IPTV_DOMAIN
-IPTV_API_HTTPS = 'https://%s/api/json/%%s' % IPTV_DOMAIN
+IPTV_API = 'http://%s/api/json/%%s&softid=web-ktv-002' % IPTV_DOMAIN
+IPTV_API_HTTPS = 'https://%s/api/json/%%s&softid=web-ktv-002' % IPTV_DOMAIN
 
 try:
 	import xbmc, xbmcaddon
